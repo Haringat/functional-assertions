@@ -14,6 +14,7 @@ export {isArrayOf} from "./is-array-of/is-array-of";
 export {isBigint} from "./is-bigint/is-bigint";
 export {isBoolean} from "./is-boolean/is-boolean";
 export {isDictionaryOf} from "./is-dictionary-of/is-dictionary-of";
+export {isEnum} from "./is-enum/is-enum";
 export {isFunction} from "./is-function/is-function";
 export {isInstanceOf} from "./is-instance-of/is-instance-of";
 export {isIterable} from "./is-iterable/is-iterable";

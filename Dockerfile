@@ -41,6 +41,6 @@ RUN echo "registry=https://registry.npmjs.org/"$'\n'\
 
 ARG BRANCH
 
-RUN test "${BRANCH}" = "master" && npx pnpm publish;
+RUN if test "${BRANCH}" = "master"; then npx pnpm publish; fi;
 
 RUN rm -f .npmrc
