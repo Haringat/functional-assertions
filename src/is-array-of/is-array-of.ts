@@ -6,7 +6,7 @@ import {createPredicate, IPredicate, typeDescription} from "../create-predicate"
  */
 export function isArrayOf<T>(predicate: IPredicate<T>): IPredicate<Array<T>> {
     return createPredicate(
-        `Array<${predicate[typeDescription]}`,
+        `Array<${predicate[typeDescription]}>`,
         (it: unknown): it is Array<T> => typeof it === "object" &&
             it !== null &&
             it instanceof Array &&

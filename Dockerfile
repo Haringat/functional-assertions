@@ -1,6 +1,6 @@
 FROM node:18-alpine as build
 
-ARG ARTIFACTS_PASSWORD
+ARG REGISTRY_TOKEN
 
 COPY package.json /src/package.json
 COPY pnpm-lock.yaml /src/pnpm-lock.yaml
@@ -9,8 +9,7 @@ WORKDIR /src
 
 RUN echo "registry=https://registry.npmjs.org/"$'\n'\
 "@di-on-solutions:registry=https://npm.pkg.github.com/"$'\n'\
-"//npm.pkg.github.com/:username=DI-ON-solutions"$'\n'\
-"//npm.pkg.github.com/:_authToken=${ARTIFACTS_PASSWORD}"$'\n'\
+"//npm.pkg.github.com/:_authToken="${REGISTRY_TOKEN}$'\n'\
 "always-auth=true" > .npmrc
 
 RUN npx pnpm install
@@ -27,7 +26,7 @@ RUN npx gulp
 
 FROM node:18-alpine
 
-ARG ARTIFACTS_PASSWORD
+ARG REGISTRY_TOKEN
 
 COPY --from=build /src/dist /app
 
@@ -35,8 +34,7 @@ WORKDIR /app
 
 RUN echo "registry=https://registry.npmjs.org/"$'\n'\
 "@di-on-solutions:registry=https://npm.pkg.github.com/"$'\n'\
-"//npm.pkg.github.com/:username=DI-ON-solutions"$'\n'\
-"//npm.pkg.github.com/:_authToken=${ARTIFACTS_PASSWORD}"$'\n'\
+"//npm.pkg.github.com/:_authToken="${REGISTRY_TOKEN}$'\n'\
 "always-auth=true" > .npmrc
 
 ARG BRANCH
