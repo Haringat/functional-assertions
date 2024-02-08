@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.json",
+  "compileOnSave": false,
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "files": [
+    "./src/index.metatest.ts"
+  ],
+  "exclude": [
+    "node_modules/**"
+  ]
+}

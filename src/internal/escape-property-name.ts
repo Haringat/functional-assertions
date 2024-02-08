@@ -1,5 +1,3 @@
-/** @ignore */
-
 // tslint:disable-next-line:max-line-length
 /**
  * a regex for all non-printable characters in unicode range 0x0000 up to 0xFFFF.
@@ -9,7 +7,7 @@ const nonPrintableUnicodeMatcher = /([\0-\x1F\x7F\u0378\u0379\u037F-\u0383\u038B
 
 /**
  * Will pad s to the left by repeating fill as often as necessary. It will always attempt to make the return value exactly length
- * characters long. The only exception from that rule is when s is already longer than length. In that case leftPad will return s as it is.
+ * characters long. The only exception to that rule is when s is already longer than length. In that case leftPad will return s as it is.
  *
  * Example:
  * ```typescript
@@ -34,16 +32,9 @@ function leftPad(s: string, length: number, fill = " ") {
  * @param it - the property name to escape
  */
 export default function escapePropertyName(it: string) {
-    return it.replace(
-        /\\/g, "\\\\"
-    ).replace(
-        /"/g,
-        "\\\""
-    ).replace(
-        /'/g,
-        "'"
-    ).replace(
-        nonPrintableUnicodeMatcher,
-        char => `\\u${leftPad(char.charCodeAt(0).toString(16), 4, "0")}`
-    );
+    return it
+        .replace(/\\/g, "\\\\")
+        .replace(/"/g, "\\\"")
+        .replace(/'/g, "'")
+        .replace(nonPrintableUnicodeMatcher, char => `\\u${leftPad(char.charCodeAt(0).toString(16), 4, "0")}`);
 }

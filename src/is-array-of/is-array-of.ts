@@ -1,7 +1,7 @@
 import {createPredicate, IPredicate, typeDescription} from "../create-predicate";
 
 /**
- * checks if all entries of an array pass the predicate parameter. This does *not* check whether or not the array contains any elements at
+ * checks if all entries of an array pass the predicate parameter. This does *not* check whether the array contains any elements at
  * all.
  */
 export function isArrayOf<T>(predicate: IPredicate<T>): IPredicate<Array<T>> {

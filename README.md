@@ -1,4 +1,4 @@
-# @di-on-solutions/functional-assertions
+# @public-cloud-group/functional-assertions
 
 This library provides several predicates and assertion functions as well as utilities to compose predicates and create
 your own ones.
@@ -24,7 +24,7 @@ serve exactly one purpose and that are easily composable.
 To use a predicate you first have to instantiate it and then call it. In the field this looks roughly like this:
 
 ```typescript
-import {assert, createPredicate, is, isUndefined, isNull, or} from "@di-on-solutions/functional-assertions";
+import {assert, createPredicate, is, isUndefined, isNull, or} from "@public-cloud-group/functional-assertions";
 
 // "is" is predicate factory. So we have to call it first to get a predicate back
 const isFour = is(4 as const);

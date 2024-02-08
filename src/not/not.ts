@@ -17,7 +17,7 @@ export interface IExcludePredicate<TXIt> extends IPredicate<Exclude<unknown, TXI
 }
 
 /**
- * Returns an inverted version of predicate which will return true if and only if predicate returns false. Otherwise it will return false.
+ * Returns an inverted version of predicate which will return true if and only if predicate returns false. Otherwise, it will return false.
  * @typeparam TXIt - The Type which the predicate checks for
  * @param predicate - The predicate to invert
  * @returns an inversion of predicate which will check for its candidate being of type !TXIt

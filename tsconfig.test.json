@@ -87,8 +87,7 @@
     "target": "ES2021",
     "traceResolution": false,
     "typeRoots": [
-      "node_modules/@types",
-      "types"
+      "node_modules/@types"
     ],
     "types": [
       "node"
@@ -96,8 +95,8 @@
     "useDefineForClassFields": true,
     "verbatimModuleSyntax": false
   },
-  "files": [
-    "./src/index.ts"
+  "include": [
+    "src/**/*.metatest.ts"
   ],
   "exclude": [
     "node_modules/**"

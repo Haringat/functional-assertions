@@ -1,24 +1,24 @@
-// @ts-check
-import {mkdir, writeFile, readFile, rm} from "node:fs/promises";
+import {mkdir, readFile, rm, writeFile} from "node:fs/promises";
 import {dirname, join} from "node:path";
 import {URL} from "node:url";
 
-import gulp from "gulp";
-import typescript from "typescript";
-import gulpTypescript from "gulp-typescript";
-import gulpTsLint from "gulp-tslint";
-import tslib from "tslint";
+import rollupPluginTypescript from "@rollup/plugin-typescript";
 import {execa} from "execa";
-import {rollup} from "rollup";
-import rollupPluginTypescript from "rollup-plugin-typescript2";
+import gulp from "gulp";
+import gulpTsLint from "gulp-tslint";
+import * as process from "process";
+import {rollup, defineConfig} from "rollup";
+import dts from "rollup-plugin-dts";
 import rollupPluginIncludepaths from "rollup-plugin-includepaths";
 import rollupPluginPureAnnotation from "rollup-plugin-pure-annotation";
-import dts from "rollup-plugin-dts"
+
+import tslib from "tslint";
+import typescript from "typescript";
 
 const gulpfileUrl = new URL(import.meta.url);
 const projectDir = dirname(gulpfileUrl.pathname);
 
-const [tsConfig, packageJson] = await (async () => {
+const [_tsConfig, packageJson] = await (async () => {
     const [tsConfigContent, packageJsonContent] = await Promise.all([
         readFile(join(projectDir, "tsconfig.json")),
         readFile(join(projectDir, "./package.json"))
@@ -29,7 +29,7 @@ const [tsConfig, packageJson] = await (async () => {
     return [
         parseJsonBuffer(tsConfigContent),
         parseJsonBuffer(packageJsonContent)
-    ]
+    ];
 })();
 
 const sources = [
@@ -38,10 +38,6 @@ const sources = [
     "!**/*.metatest.ts",
     "!./src/internal/metatest-helpers.ts"
 ];
-
-function camelCase(it) {
-    return it.replace(/-[a-z]/g, (match) => match[1].toLocaleUpperCase());
-}
 
 export async function declarations() {
     const pkg = await rollup({
@@ -82,7 +78,8 @@ export function writePackageJson() {
         peerDependencies: packageJson.peerDependencies,
         sideEffects: !!packageJson.sideEffects,
         typings: `index.d.ts`,
-        version: packageJson.version
+        version: packageJson.version,
+        license: packageJson.license
     };
     const jsonString = JSON.stringify(json, null, 4);
     const content = Buffer.from(jsonString, "utf8");
@@ -94,40 +91,29 @@ export function createDist() {
 }
 
 export function metatest() {
-    return gulp.src([
-        "./src/**/*.metatest.ts"
-    ])
-        .pipe(gulpTypescript({
-            ...tsConfig.compilerOptions,
-            typescript,
-            declarationDir: undefined,
-            declarationMap: undefined,
-            sourceRoot: undefined
-        }));
+    return execa("tsc", ["-p", "tsconfig.metatest.json"], {
+        preferLocal: true,
+        stderr: process.stderr,
+        stdout: process.stdout
+    })
 }
 
 export async function test() {
     const [command, ...args] = packageJson.scripts.test.split(" ");
-    const ava = execa(command, args, {
-        preferLocal: true
+    return execa(command, args, {
+        preferLocal: true,
+        stderr: process.stderr,
+        stdout: process.stdout
     });
-
-    ava.stderr.pipe(process.stderr);
-    ava.stdout.pipe(process.stdout);
-
-    return ava;
 }
 
 export async function doc() {
     const [command, ...args] = packageJson.scripts.doc.split(" ");
-    const typedoc = execa(command, args, {
-        preferLocal: true
+    return execa(command, args, {
+        preferLocal: true,
+        stderr: process.stderr,
+        stdout: process.stdout
     });
-
-    typedoc.stderr.pipe(process.stderr);
-    typedoc.stdout.pipe(process.stdout);
-
-    return typedoc;
 }
 
 export function copyReadMe() {
@@ -135,29 +121,30 @@ export function copyReadMe() {
         .pipe(gulp.dest("./dist"));
 }
 
+const rollupConfig = defineConfig({
+    input: "src/index.ts",
+    plugins: [
+        rollupPluginTypescript({
+            compilerOptions: {
+                allowImportingTsExtensions: undefined,
+                declaration: false,
+                declarationDir: undefined,
+                declarationMap: false,
+                module: "ESNext",
+                target: "ES2021"
+            },
+            tsconfig: "tsconfig.json",
+            typescript
+        }),
+        rollupPluginIncludepaths({
+            external: ["tslib"],
+        }),
+        rollupPluginPureAnnotation()
+    ]
+});
+
 export async function fesm2021() {
-    const pkg = await rollup({
-        input: "src/index.ts",
-        plugins: [
-            rollupPluginTypescript({
-                tsconfig: "tsconfig.json",
-                tsconfigOverride: {
-                    compilerOptions: {
-                        target: "ES2021",
-                        module: "ESNext",
-                        declaration: false,
-                        declarationDir: undefined,
-                        declarationMap: false
-                    }
-                },
-                typescript
-            }),
-            rollupPluginIncludepaths({
-                external: ["tslib"],
-            }),
-            rollupPluginPureAnnotation()
-        ]
-    });
+    const pkg = await rollup(rollupConfig);
     await pkg.write({
         format: "esm",
         // file: `./dist/fesm2021/${name}.js`
